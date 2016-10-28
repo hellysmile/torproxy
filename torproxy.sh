@@ -129,6 +129,8 @@ elif [[ $# -ge 1 ]]; then
 elif ps -ef | egrep -v 'grep|torproxy.sh' | grep -q tor; then
     echo "Service already running, please restart container to apply changes"
 else
+    /usr/sbin/haproxy -f /etc/haproxy/haproxy.cfg
+
     [[ -e /srv/tor/hidden_service/hostname ]] && {
         echo -en "\nHidden service hostname: "
         cat /srv/tor/hidden_service/hostname; echo; }

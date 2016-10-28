@@ -10,7 +10,7 @@ RUN export DEBIAN_FRONTEND='noninteractive' && \
     /bin/echo -n "deb http://deb.torproject.org/torproject.org stretch main" \
                 >>/etc/apt/sources.list && \
     apt-get update -qq && \
-    apt-get install -qqy --no-install-recommends tor privoxy \
+    apt-get install -qqy --no-install-recommends tor privoxy haproxy \
                 $(apt-get -s dist-upgrade|awk '/^Inst.*ecurity/ {print $2}') &&\
     sed -i 's|^\(accept-intercepted-requests\) .*|\1 1|' /etc/privoxy/config &&\
     sed -i 's|localhost:8118|0.0.0.0:8118|' /etc/privoxy/config && \
@@ -61,8 +61,8 @@ RUN export DEBIAN_FRONTEND='noninteractive' && \
     echo 'ControlSocket /etc/tor/run/control' >>/etc/tor/torrc && \
     echo 'ControlSocketsGroupWritable 1' >>/etc/tor/torrc && \
     echo 'ControlPort 9051' >>/etc/tor/torrc && \
-    echo 'CookieAuthentication 1' >>/etc/tor/torrc && \
-    echo 'CookieAuthFileGroupReadable 1' >>/etc/tor/torrc && \
+    echo 'CookieAuthentication 0' >>/etc/tor/torrc && \
+    # echo 'CookieAuthFileGroupReadable 1' >>/etc/tor/torrc && \
     echo 'CookieAuthFile /etc/tor/run/control.authcookie' >>/etc/tor/torrc && \
     echo 'DataDirectory /var/lib/tor' >>/etc/tor/torrc && \
     echo 'RunAsDaemon 0' >>/etc/tor/torrc && \
@@ -84,7 +84,9 @@ RUN export DEBIAN_FRONTEND='noninteractive' && \
     #echo 'Log notice file /dev/stdout' >>/etc/tor/torrc && \
 COPY torproxy.sh /usr/bin/
 
-EXPOSE 8118 9050 9051
+COPY haproxy.cfg /etc/haproxy/haproxy.cfg
+
+EXPOSE 8118 9050 9051 9052
 
 VOLUME ["/etc/tor", "/var/lib/tor"]
 
